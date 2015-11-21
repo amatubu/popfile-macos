@@ -1,0 +1,9 @@
+#!/bin/sh
+
+PERL518=`/usr/bin/perl -e 'print $] =~ m/^5.018/;'`
+if [ "${PERL518}" = "1" ];
+then
+    exit 0
+else
+    exit 64
+fi

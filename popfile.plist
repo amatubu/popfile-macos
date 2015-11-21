@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Disabled</key>
+	<false />
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>ITAIJIDICTPATH</key>
+		<string>/Library/POPFile/kakasi/itaijidict</string>
+		<key>KANWADICTPATH</key>
+		<string>/Library/POPFile/kakasi/kanwadict</string>
+		<key>MECABRC</key>
+		<string>/Library/POPFile/mecab/etc/mecabrc</string>
+		<key>POPFILE_ROOT</key>
+		<string>/Library/POPFile/</string>
+		<key>POPFILE_USER</key>
+		<string>/Library/POPFile/</string>
+	</dict>
+	<key>StandardErrorPath</key>
+	<string>/Library/Logs/POPFile/error.log</string>
+	<key>StandardOutPath</key>
+	<string>/Library/Logs/POPFile/console.log</string>
+	<key>Label</key>
+	<string>org.getpopfile.popfile</string>
+	<key>KeepAlive</key>
+	<false />
+	<key>RunAtLoad</key>
+	<true />
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/perl</string>
+		<string>-I/Library/POPFile/lib</string>
+		<string>/Library/POPFile/popfile.pl</string>
+		<string>-logger_logdir</string>
+		<string>/Library/Logs/POPFile/</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,93 @@
+#!/bin/sh
+
+# Copyright (c) John Graham-Cumming
+#
+#   This file is part of POPFile
+#
+#   POPFile is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   POPFile is free software; you can redistribute it and/or modify it
+#   under the terms of version 2 of the GNU General Public License as
+#   published by the Free Software Foundation.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with POPFile; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+
+# Constants
+POPFILE_STARTUP=/Library/StartupItems/POPFile/POPFile
+POPFILE_PLIST=/Library/LaunchDaemons/popfile.plist
+POPFILE_LABEL=org.getpopfile.popfile
+POPFILE_DIR=/Library/POPFile
+STOPWORDS_PATH="$POPFILE_DIR"/stopwords
+POPFILE_DB_PATH="$POPFILE_DIR"/popfile.db
+POPFILE_CFG_PATH="$POPFILE_DIR"/popfile.cfg
+
+# Stop POPFile (StartupItems)
+if [ -e "$POPFILE_STARTUP" ]; then
+	"$POPFILE_STARTUP" stop
+fi
+
+# Stop POPFile (launchd)
+if [ -e "$POPFILE_PLIST" ]; then
+	launchctl unload "$POPFILE_PLIST"
+	launchctl stop "$POPFILE_LABEL"
+fi
+
+# Stop POPFile (manually)
+pid=$( ps -axww | grep popfile.pl | grep -v grep | awk '{ print $1 }' )
+if [ "" != "$pid" ]; then
+	kill -6 $pid
+	rm -f "$POPFILE_DIR"/popfile.pid
+fi
+
+# Back up stopwords
+if [ -e "$STOPWORDS_PATH" ]; then
+	rm "$STOPWORDS_PATH".old
+	cp "$STOPWORDS_PATH" "$STOPWORDS_PATH".old
+fi
+
+# Back up database
+if [ -e "$POPFILE_DB_PATH" ]; then
+	rm "$POPFILE_DB_PATH".old
+	cp "$POPFILE_DB_PATH" "$POPFILE_DB_PATH".old
+fi
+
+# Back up configuration
+if [ -e "$POPFILE_CFG_PATH" ]; then
+	rm "$POPFILE_CFG_PATH".old
+	cp "$POPFILE_CFG_PATH" "$POPFILE_CFG_PATH".old
+else
+	# Create a new configration file
+	# Check System Language
+	LANG=`echo '(ja, en)' | sed 's/.\(..\).*/\1/'`
+	# echo $LANG
+	
+	case $LANG in
+		ja)
+			PFLANG='Nihongo'
+			;;
+		en)
+			PFLANG='English'
+			;;
+		*)
+			PFLANG='English'
+			;;
+	esac
+	
+	# echo $PFLANG
+	
+	echo "html_language $PFLANG" > "$POPFILE_CFG_PATH"
+fi
+
+# Remove skins folder
+rm -rf "$POPFILE_DIR"/skins
+
+# Remove startup script
+rm -rf /Library/StartupItems/POPFile
+
+exit 0

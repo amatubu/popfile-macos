@@ -22,46 +22,56 @@ require ExtUtils::FakeConfig;
 
 my $PERL_VERSION = $];
 
+my ( $OS_VERSION, $OS_MAJOR, $OS_MINOR ) = split( /\./, `sw_vers -productVersion` );
+
 my ( $SDK, $MIN_VERSION, $ARCH );
 
-if ( $PERL_VERSION ge '5.010000' ) {
-    if ( $PERL_VERSION ge '5.012000' ) {
-        if ( $PERL_VERSION ge '5.018000' ) {
-            # Mac OS X 10.10 or later
+if ( $OS_VERSION eq '10' ) {
+    if ( $PERL_VERSION ge '5.010000' ) {
+        if ( $PERL_VERSION ge '5.012000' ) {
+            if ( $PERL_VERSION ge '5.018000' ) {
+                # Mac OS X 10.10 or later
 
-            $SDK = `xcodebuild -version -sdk macosx10.10 | grep ^Path: | awk '{print \$2}'`;
-            chomp $SDK;
-            $MIN_VERSION = '-mmacosx-version-min=10.10';
-            $ARCH = '-arch i386 -arch x86_64';
+                $SDK = `xcodebuild -version -sdk macosx10.12 | grep ^Path: | awk '{print \$2}'`;
+                chomp $SDK;
+                $MIN_VERSION = '-mmacosx-version-min=10.10';
+                $ARCH = '-arch i386 -arch x86_64';
+            } else {
+                # Mac OS X 10.7 or later
+
+                $SDK = `xcodebuild -version -sdk macosx10.7 | grep ^Path: | awk '{print \$2}'`;
+                chomp $SDK;
+                $MIN_VERSION = '-mmacosx-version-min=10.7';
+                $ARCH = '-arch i386 -arch x86_64';
+            }
         } else {
-            # Mac OS X 10.7 or later
+            # Mac OS X 10.6 or later
 
-            $SDK = `xcodebuild -version -sdk macosx10.7 | grep ^Path: | awk '{print \$2}'`;
-            chomp $SDK;
-            $MIN_VERSION = '-mmacosx-version-min=10.7';
-            $ARCH = '-arch i386 -arch x86_64';
+            $SDK = '/Developer/SDKs/MacOSX10.6.sdk';
+            $MIN_VERSION = '-mmacosx-version-min=10.6';
+            $ARCH = '-arch i386 -arch ppc7400 -arch x86_64';
         }
     } else {
-        # Mac OS X 10.6 or later
+        # Mac OS X 10.5.x or earlier
 
-        $SDK = '/Developer/SDKs/MacOSX10.6.sdk';
-        $MIN_VERSION = '-mmacosx-version-min=10.6';
-        $ARCH = '-arch i386 -arch ppc7400 -arch x86_64';
+        $SDK = '/Developer/SDKs/MacOSX10.4u.sdk';
+        $MIN_VERSION = '-mmacosx-version-min=10.3';
+        $ARCH = '-arch i386 -arch ppc750 -arch ppc7400';
     }
 } else {
-    # Mac OS X 10.5.x or earlier
+    # Mac OS X 11 or later
 
-    $SDK = '/Developer/SDKs/MacOSX10.4u.sdk';
-    $MIN_VERSION = '-mmacosx-version-min=10.3';
-    $ARCH = '-arch i386 -arch ppc750 -arch ppc7400';
-
+    $SDK = `xcodebuild -version -sdk macosx | grep ^Path: | awk '{print \$2}'`;
+    chomp $SDK;
+    $MIN_VERSION = '-mmacosx-version-min=11.1';
+    $ARCH = '-arch arm64 -arch x86_64';
 }
 
 my %params = (
-    ccflags => "-g -pipe -fno-common -DPERL_DARWIN $MIN_VERSION -no-cpp-precomp $ARCH -isysroot $SDK -fno-strict-aliasing",
+ccflags => "-g -pipe -fno-common -DPERL_DARWIN $MIN_VERSION -no-cpp-precomp $ARCH -isysroot $SDK -fno-strict-aliasing -IOpenSSL_1_1_1i/include -Wno-implicit-function-declaration",
     ld => "cc $MIN_VERSION -isysroot $SDK",
-    ldflags => "$ARCH",
-    lddlflags => "-bundle -undefined dynamic_lookup $ARCH",
+    ldflags => "$ARCH -LOpenSSL_1_1_1i/lib",
+    lddlflags => "-bundle -undefined dynamic_lookup $ARCH -LOpenSSL_1_1_1i/lib",
 );
 
 eval 'use ExtUtils::FakeConfig %params';

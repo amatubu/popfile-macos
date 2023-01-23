@@ -32,6 +32,7 @@ PACKAGE_VERSION_RC=$(RC)
 PACKAGE_NAME=$(PACKAGE_TITLE)-$(PACKAGE_VERSION)$(PACKAGE_VERSION_RC)
 PACKAGE_ROOT=./Package_Root
 PACKAGE_ID=org.getpopfile.macosx
+DAEMON_ID=org.getpopfile.popfile
 
 RESOURCES=./Resources
 
@@ -47,6 +48,9 @@ IMAGE_TMP=$(VOLUME_NAME)_tmp.dmg
 ARCHIVE=$(VOLUME_NAME)-macosx.dmg.gz
 
 PACKAGE_MAKER = /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker
+PACKAGE_BUILD = /usr/bin/pkgbuild
+
+PERL = /usr/bin/perl
 
 
 all: build
@@ -63,7 +67,7 @@ $(IMAGE): installer utility_scripts
 	
 	@echo "Creating disk image ..."
 	
-	hdiutil create -megabytes 8 $(IMAGE) -layout NONE
+	hdiutil create -megabytes 15 $(IMAGE) -layout NONE
 	disk=`hdid -nomount $(IMAGE)` ; \
 	newfs_hfs -v $(VOLUME_NAME) $$disk ; \
 	hdiutil eject $$disk ; \
@@ -99,14 +103,25 @@ installer: $(engine) ./Readme.txt ./Readme-SnowLeopard.txt ./Readme-Lion.txt ./R
 	@echo "Applying recommended permissions..."
 
 	sudo chown -R root:wheel $(PACKAGE_ROOT)/Library/LaunchDaemons
-	sudo chmod 644 $(PACKAGE_ROOT)/Library/LaunchDaemons/popfile.plist
+	sudo chmod 644 $(PACKAGE_ROOT)/Library/LaunchDaemons/$(DAEMON_ID).plist
 	#sudo chown -R root:admin $(PACKAGE_ROOT)/Library/POPFile
 
 	@echo "...done"
 
 	@echo "Building installer packages ..."
 
-	$(PACKAGE_MAKER) \
+	OS_VERSION=`sw_vers -productVersion | awk -F "." '{print $$1}'`; \
+	if test "$$OS_VERSION" == "11" -o "$$OS_VERSION" == "12" -o "$$OS_VERSION" == "13"; \
+	then \
+	  $(PACKAGE_BUILD) \
+	    --root $(PACKAGE_ROOT) \
+		--identifier $(PACKAGE_ID) \
+		--install-location / \
+		--version $(PACKAGE_VERSION) \
+		--scripts $(RESOURCES) \
+		$(PACKAGE) ; \
+	else \
+	  $(PACKAGE_MAKER) \
 		--root $(PACKAGE_ROOT) \
 		--id $(PACKAGE_ID) \
 		--out $(PACKAGE) \
@@ -119,7 +134,8 @@ installer: $(engine) ./Readme.txt ./Readme-SnowLeopard.txt ./Readme-Lion.txt ./R
 		--version $(PACKAGE_VERSION) \
 		--filter CVS \
 		--filter .svn \
-		--verbose
+		--verbose ; \
+	fi
 
 	@echo "...done"
 
@@ -130,22 +146,35 @@ installer: $(engine) ./Readme.txt ./Readme-SnowLeopard.txt ./Readme-Lion.txt ./R
 
 	@echo "...done"
 
-	PERL510=`perl -e 'print $$] ge qw{5.010000};'`; \
-	PERL512=`perl -e 'print $$] ge qw{5.012000};'`; \
-	PERL518=`perl -e 'print $$] ge qw{5.018000};'`; \
-	if test "$$PERL518" == "1"; \
+	PERL510=`$(PERL) -e 'print $$] ge qw{5.010000};'`; \
+	PERL512=`$(PERL) -e 'print $$] ge qw{5.012000};'`; \
+	PERL518=`$(PERL) -e 'print $$] ge qw{5.018000};'`; \
+	PERL530=`$(PERL) -e 'print $$] ge qw{5.030000};'`; \
+	OS_VERSION=`sw_vers -productVersion | awk -F "." '{print $$1}'`; \
+	OS_MAJOR=`sw_vers -productVersion | awk -F "." '{print $$2}'`; \
+	if test "$$OS_VERSION" == "11"; \
 	then \
-		cp ./Readme-Yosemite.txt $(PACKAGE_DIST); \
+		cp ./Readme-BigSur.txt $(PACKAGE_DIST); \
 	else \
-		if test "$$PERL512" == "1"; \
+		if test "$$OS_VERSION" == "12" -o "$$OS_VERSION" == "13"; \
 		then \
-			cp ./Readme-Lion.txt $(PACKAGE_DIST); \
+			cp ./Readme-Monterery.txt $(PACKAGE_DIST); \
 		else \
-			if test "$$PERL512" == "1"; \
+			if test "$$PERL518" == "1"; \
 			then \
-				cp ./Readme-SnowLeopard.txt $(PACKAGE_DIST); \
+				cp ./Readme-Yosemite.txt $(PACKAGE_DIST); \
 			else \
-				cp ./Readme.txt $(PACKAGE_DIST); \
+				if test "$$PERL512" == "1"; \
+				then \
+					cp ./Readme-Lion.txt $(PACKAGE_DIST); \
+				else \
+					if test "$$PERL510" == "1"; \
+					then \
+						cp ./Readme-SnowLeopard.txt $(PACKAGE_DIST); \
+					else \
+						cp ./Readme.txt $(PACKAGE_DIST); \
+					fi; \
+				fi; \
 			fi; \
 		fi; \
 	fi;
@@ -168,29 +197,43 @@ documents: $(ENGINE)/license $(ENGINE)/v$(POPFILE_VERSION).change $(ENGINE)/v$(P
 	cp $(ENGINE)/license $(RESOURCES)/License.txt
 	if test ! -d $(RESOURCES)/English.lproj; then mkdir $(RESOURCES)/English.lproj ; fi
 	if test ! -d $(RESOURCES)/Japanese.lproj; then mkdir $(RESOURCES)/Japanese.lproj ; fi
-	perl -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;print;' < $(ENGINE)/v$(POPFILE_VERSION).change > $(RESOURCES)/English.lproj/ReadMe.txt
-	SWVER=`sw_vers -productVersion | awk -F "." '{print $$2}'`; \
-	if test "$$SWVER" == "6"; \
-	then \
-		perl -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
-		cp InstallationCheck-SnowLeopard $(RESOURCES)/InstallationCheck; \
-		cp popfile-SnowLeopard.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/popfile.plist; \
-	else \
-		if test "$$SWVER" == "7" -o "$$SWVER" == "8" -o "$$SWVER" == "9"; \
+	$(PERL) -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;print;' < $(ENGINE)/v$(POPFILE_VERSION).change > $(RESOURCES)/English.lproj/ReadMe.txt
+	OS_VERSION=`sw_vers -productVersion | awk -F "." '{print $$1}'`; \
+	OS_MAJOR=`sw_vers -productVersion | awk -F "." '{print $$2}'`; \
+	if test "$$OS_VERSION" == "11" -o "$$OS_VERSION" == "12" -o "$$OS_VERSION" == "13"; \
 		then \
-			perl -MEncode -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;Encode::from_to($$_,"shift_jis","utf8");print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
-			cp InstallationCheck-Lion $(RESOURCES)/InstallationCheck; \
-			cp popfile-Lion.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/popfile.plist; \
-		else \
-		if test "$$SWVER" == "10" -o "$$SWVER" == "11"; \
+			$(PERL) -MEncode -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;Encode::from_to($$_,"shift_jis","utf8");print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
+			if test "$$OS_VERSION" == "12" -o "$$OS_VERSION" == "13"; \
 			then \
-				perl -MEncode -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;Encode::from_to($$_,"shift_jis","utf8");print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
-				cp InstallationCheck-Yosemite $(RESOURCES)/InstallationCheck; \
-				cp popfile-Yosemite.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/popfile.plist; \
+				cp InstallationCheck-Monterery $(RESOURCES)/InstallationCheck; \
+				cp popfile-Monterery.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/$(DAEMON_ID).plist; \
 			else \
-				perl -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
-				cp InstallationCheck $(RESOURCES)/InstallationCheck; \
-				cp popfile.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/popfile.plist; \
+				cp InstallationCheck-BigSur $(RESOURCES)/InstallationCheck; \
+				cp popfile-Yosemite.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/$(DAEMON_ID).plist; \
+			fi; \
+	else \
+		if test "$$OS_MAJOR" == "6"; \
+		then \
+			$(PERL) -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
+			cp InstallationCheck-SnowLeopard $(RESOURCES)/InstallationCheck; \
+			cp popfile-SnowLeopard.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/$(DAEMON_ID).plist; \
+		else \
+			if test "$$OS_MAJOR" == "7" -o "$$OS_MAJOR" == "8" -o "$$OS_MAJOR" == "9"; \
+			then \
+				$(PERL) -MEncode -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;Encode::from_to($$_,"shift_jis","utf8");print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
+				cp InstallationCheck-Lion $(RESOURCES)/InstallationCheck; \
+				cp popfile-Lion.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/$(DAEMON_ID).plist; \
+			else \
+			if test "$$OS_MAJOR" == "10" -o "$$OS_MAJOR" == "11" -o "$$OS_MAJOR" == "12" -o "$$OS_MAJOR" == "13" -o "$$OS_MAJOR" == "14" -o "$$OS_MAJOR" == "14" -o "$$OS_MAJOR" == "15"; \
+				then \
+					$(PERL) -MEncode -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;Encode::from_to($$_,"shift_jis","utf8");print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
+					cp InstallationCheck-Yosemite $(RESOURCES)/InstallationCheck; \
+					cp popfile-Yosemite.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/$(DAEMON_ID).plist; \
+				else \
+					$(PERL) -e '$$_=join(qw(),<>);s/(?<!\n)\n(?![\n ])/ /g;print;' <  $(ENGINE)/v$(POPFILE_VERSION).change.nihongo > $(RESOURCES)/Japanese.lproj/ReadMe.txt; \
+					cp InstallationCheck $(RESOURCES)/InstallationCheck; \
+					cp popfile.plist $(PACKAGE_ROOT)/Library/LaunchDaemons/$(DAEMON_ID).plist; \
+				fi; \
 			fi; \
 		fi; \
 	fi;

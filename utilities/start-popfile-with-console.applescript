@@ -30,7 +30,7 @@ else
 
     tell application "Terminal"
         activate
-        do script with command "cd /Library/POPFile/; sudo VERSIONER_PERL_VERSION=5.18 /usr/bin/perl -Ilib popfile.pl"
+        do script with command "cd /Library/POPFile/; sudo VERSIONER_PERL_VERSION=5.18 /usr/bin/perl -I/Library/POPFile/lib popfile.pl"
     end tell
 
 end if

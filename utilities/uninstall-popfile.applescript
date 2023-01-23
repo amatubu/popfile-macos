@@ -26,7 +26,7 @@ if pid is not "" then
 
     -- Stop POPFile by using startup-script
 
-    do shell script "launchctl unload /Library/LaunchDaemons/popfile.plist; launchctl stop org.getpopfile.popfile" with administrator privileges
+    do shell script "launchctl unload /Library/LaunchDaemons/org.getpopfile.popfile.plist; launchctl stop org.getpopfile.popfile" with administrator privileges
 
 end if
 
@@ -38,5 +38,5 @@ if the button returned of result is "Uninstall" then
 
     -- Remove POPFile installation folder and StartupItems folder
 
-    do shell script "rm -rf /Library/POPFile; rm -rf /Library/StartupItems/POPFile; rm -f /Library/LaunchDaemons/popfile.plist" with administrator privileges
+    do shell script "rm -rf /Library/POPFile; rm -rf /Library/StartupItems/POPFile; rm -f /Library/LaunchDaemons/popfile.plist; rm -rf /Library/LaunchDaemons/org.getpopfile.popfile.plist" with administrator privileges
 end if

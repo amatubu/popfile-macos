@@ -20,7 +20,8 @@
 
 # Constants
 POPFILE_STARTUP=/Library/StartupItems/POPFile/POPFile
-POPFILE_PLIST=/Library/LaunchDaemons/popfile.plist
+POPFILE_PLIST=/Library/LaunchDaemons/org.getpopfile.popfile.plist
+POPFILE_PLIST_OLD=/Library/LaunchDaemons/popfile.plist
 POPFILE_LABEL=org.getpopfile.popfile
 POPFILE_DIR=/Library/POPFile
 STOPWORDS_PATH="$POPFILE_DIR"/stopwords
@@ -36,6 +37,12 @@ fi
 if [ -e "$POPFILE_PLIST" ]; then
 	launchctl unload "$POPFILE_PLIST"
 	launchctl stop "$POPFILE_LABEL"
+else
+	if [ -e "$POPFILE_PLIST_OLD" ]; then
+		launchctl unload "$POPFILE_PLIST_OLD"
+		launchctl stop "$POPFILE_LABEL"
+		rm -f "$POPFILE_PLIST_OLD"
+	fi
 fi
 
 # Stop POPFile (manually)
@@ -47,24 +54,25 @@ fi
 
 # Back up stopwords
 if [ -e "$STOPWORDS_PATH" ]; then
-	rm "$STOPWORDS_PATH".old
+	rm -f "$STOPWORDS_PATH".old
 	cp "$STOPWORDS_PATH" "$STOPWORDS_PATH".old
 fi
 
 # Back up database
 if [ -e "$POPFILE_DB_PATH" ]; then
-	rm "$POPFILE_DB_PATH".old
+	rm -f "$POPFILE_DB_PATH".old
 	cp "$POPFILE_DB_PATH" "$POPFILE_DB_PATH".old
 fi
 
 # Back up configuration
 if [ -e "$POPFILE_CFG_PATH" ]; then
-	rm "$POPFILE_CFG_PATH".old
+	rm -f "$POPFILE_CFG_PATH".old
 	cp "$POPFILE_CFG_PATH" "$POPFILE_CFG_PATH".old
 else
 	# Create a new configration file
 	# Check System Language
-	LANG=`echo '(ja, en)' | sed 's/.\(..\).*/\1/'`
+	echo $USER
+	LANG=`sudo -u $USER defaults read -g AppleLocale | awk -F '_' '{print $$1}'`
 	# echo $LANG
 	
 	case $LANG in
@@ -80,7 +88,8 @@ else
 	esac
 	
 	# echo $PFLANG
-	
+
+	if [ ! -d "$POPFILE_DIR" ]; then mkdir "$POPFILE_DIR"; fi
 	echo "html_language $PFLANG" > "$POPFILE_CFG_PATH"
 fi
 

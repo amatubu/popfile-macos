@@ -26,7 +26,7 @@ if pid is not "" then
 
     -- Stop POPFile by using startup-script
 
-    do shell script "launchctl stop org.getpopfile.popfile; launchctl unload /Library/LaunchDaemons/popfile.plist" with administrator privileges
+    do shell script "launchctl stop org.getpopfile.popfile; launchctl unload /Library/LaunchDaemons/org.getpopfile.popfile.plist" with administrator privileges
 
 else
     display dialog "POPFile is not running."

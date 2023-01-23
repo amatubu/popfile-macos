@@ -1,5 +1,6 @@
 #!/bin/sh
 
+VERSIONER_PERL_VERSION=5.18 \
 PERL518=`/usr/bin/perl -e 'print $] =~ m/^5.018/;'`
 if [ "${PERL518}" = "1" ];
 then

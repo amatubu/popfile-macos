@@ -21,6 +21,8 @@
 
 .PHONY: all build clean
 
+PERL=/usr/bin/perl
+
 PACKAGE_ROOT=../Package_Root
 POPFILE_ROOT=$(PACKAGE_ROOT)/Library/POPFile
 LIB_ROOT = $(POPFILE_ROOT)/lib
@@ -39,11 +41,11 @@ DBI = DBI-1.634
 DBI_ARCHIVE = $(DBI).tar.gz
 DBI_URL = http://search.cpan.org/CPAN/authors/id/T/TI/TIMB/$(DBI_ARCHIVE)
 
-SQLITE = DBD-SQLite-1.48
+SQLITE = DBD-SQLite-1.66
 SQLITE_ARCHIVE = $(SQLITE).tar.gz
 SQLITE_URL = http://search.cpan.org/CPAN/authors/id/I/IS/ISHIGAKI/$(SQLITE_ARCHIVE)
 
-SQLITE2 = DBD-SQLite2-0.36
+SQLITE2 = DBD-SQLite2-0.38
 SQLITE2_ARCHIVE = $(SQLITE2).tar.gz
 SQLITE2_URL = http://search.cpan.org/CPAN/authors/id/R/RU/RURBAN/$(SQLITE2_ARCHIVE)
 
@@ -51,27 +53,27 @@ TAGSET = HTML-Tagset-3.20
 TAGSET_ARCHIVE = $(TAGSET).tar.gz
 TAGSET_URL = http://search.cpan.org/CPAN/authors/id/P/PE/PETDANCE/$(TAGSET_ARCHIVE)
 
-TEMPLATE = HTML-Template-2.95
+TEMPLATE = HTML-Template-2.97
 TEMPLATE_ARCHIVE = $(TEMPLATE).tar.gz
-TEMPLATE_URL = http://search.cpan.org/CPAN/authors/id/W/WO/WONKO/$(TEMPLATE_ARCHIVE)
+TEMPLATE_URL = http://search.cpan.org/CPAN/authors/id/S/SA/SAMTREGAR/$(TEMPLATE_ARCHIVE)
 
-TIMEDATE = TimeDate-2.30
+TIMEDATE = TimeDate-2.33
 TIMEDATE_ARCHIVE = $(TIMEDATE).tar.gz
-TIMEDATE_URL = http://search.cpan.org/CPAN/authors/id/G/GB/GBARR/$(TIMEDATE_ARCHIVE)
+TIMEDATE_URL = http://search.cpan.org/CPAN/authors/id/A/AT/ATOOMIC/$(TIMEDATE_ARCHIVE)
 
 # XMLRCP Support
 
-SOAPLITE = SOAP-Lite-0.716
+SOAPLITE = SOAP-Lite-1.27
 SOAPLITE_ARCHIVE = $(SOAPLITE).tar.gz
 SOAPLITE_URL = http://search.cpan.org/CPAN/authors/id/P/PH/PHRED/$(SOAPLITE_ARCHIVE)
 
-CLASS_INSPECTOR = Class-Inspector-1.28
+CLASS_INSPECTOR = Class-Inspector-1.36
 CLASS_INSPECTOR_ARCHIVE = $(CLASS_INSPECTOR).tar.gz
-CLASS_INSPECTOR_URL = http://search.cpan.org/CPAN/authors/id/A/AD/ADAMK/$(CLASS_INSPECTOR_ARCHIVE)
+CLASS_INSPECTOR_URL = http://search.cpan.org/CPAN/authors/id/P/PL/PLICEASE/$(CLASS_INSPECTOR_ARCHIVE)
 
-VERSION_MODULE = version-0.9912
+VERSION_MODULE = version-0.9928
 VERSION_ARCHIVE = $(VERSION_MODULE).tar.gz
-VERSION_URL = http://search.cpan.org/CPAN/authors/id/J/JP/JPEACOCK/$(VERSION_ARCHIVE)
+VERSION_URL = http://search.cpan.org/CPAN/authors/id/L/LE/LEONT/$(VERSION_ARCHIVE)
 
 # Japanese support
 
@@ -89,21 +91,29 @@ ENCODE_IMAPUTF7_URL = http://search.cpan.org/CPAN/authors/id/P/PM/PMAKHOLM/$(ENC
 
 # SSL support
 
-NETSSLEAY = Net-SSLeay-1.72
-NETSSLEAY_ARCHIVE = $(NETSSLEAY).tar.gz
-NETSSLEAY_URL = http://search.cpan.org/CPAN/authors/id/M/MI/MIKEM/$(NETSSLEAY_ARCHIVE)
+OPENSSL = OpenSSL_1_1_1i
+OPENSSL_x86 = $(OPENSSL)_x86
+OPENSSL_x64 = $(OPENSSL)_x64
+OPENSSL_arm64 = $(OPENSSL)_arm64
+OPENSSL_universal = openssl
+OPENSSL_ARCHIVE = $(OPENSSL).tar.gz
+OPENSSL_URL = https://github.com/openssl/openssl/archive/$(OPENSSL_ARCHIVE)
 
-IOSOCKETSSL = IO-Socket-SSL-2.020
+NETSSLEAY = Net-SSLeay-1.88
+NETSSLEAY_ARCHIVE = $(NETSSLEAY).tar.gz
+NETSSLEAY_URL = http://search.cpan.org/CPAN/authors/id/C/CH/CHRISN/$(NETSSLEAY_ARCHIVE)
+
+IOSOCKETSSL = IO-Socket-SSL-2.068
 IOSOCKETSSL_ARCHIVE = $(IOSOCKETSSL).tar.gz
 IOSOCKETSSL_URL = http://search.cpan.org/CPAN/authors/id/S/SU/SULLR/$(IOSOCKETSSL_ARCHIVE)
 
-MOZILLA_CA = Mozilla-CA-20150826
+MOZILLA_CA = Mozilla-CA-20200520
 MOZILLA_CA_ARCHIVE = $(MOZILLA_CA).tar.gz
 MOZILLA_CA_URL = http://search.cpan.org/CPAN/authors/id/A/AB/ABH/$(MOZILLA_CA_ARCHIVE)
 
 # Socks support
 
-SOCKS = IO-Socket-Socks-0.67
+SOCKS = IO-Socket-Socks-0.74
 SOCKS_ARCHIVE = $(SOCKS).tar.gz
 SOCKS_URL = http://search.cpan.org/CPAN/authors/id/O/OL/OLEG/$(SOCKS_ARCHIVE)
 
@@ -117,8 +127,8 @@ JAPANESESUPPORT_MODULES = $(KAKASI) $(TEXTKAKASI) $(ENCODE_IMAPUTF7)
 XMLRPC_ARCHIVES = $(SOAPLITE_ARCHIVE) $(VERSION_ARCHIVE) $(CLASS_INSPECTOR_ARCHIVE)
 XMLRPC_MODULES = $(SOAPLITE) $(VERSION_MODULE) $(CLASS_INSPECTOR)
 
-SSL_ARCHIVES = $(NETSSLEAY_ARCHIVE) $(IOSOCKETSSL_ARCHIVE) $(MOZILLA_CA_ARCHIVE)
-SSL_MODULES = $(NETSSLEAY) $(IOSOCKETSSL) $(MOZILLA_CA)
+SSL_ARCHIVES = $(OPENSSL_ARCHIVE) $(NETSSLEAY_ARCHIVE) $(IOSOCKETSSL_ARCHIVE) $(MOZILLA_CA_ARCHIVE)
+SSL_MODULES = $(OPENSSL) $(OPENSSL_x86) $(OPENSSL_x64) $(OPENSSL_arm64) $(NETSSLEAY) $(IOSOCKETSSL) $(MOZILLA_CA)
 
 SOCKS_ARCHIVES = $(SOCKS_ARCHIVE)
 SOCKS_MODULES = $(SOCKS)
@@ -195,48 +205,50 @@ core_modules_build: $(CORE_ARCHIVES)
 core_modules_build: fakeconfig
 	if test ! -d $(DBI); then tar xzf $(DBI_ARCHIVE); patch $(DBI)/DBIXS.h < ./DBIXS.h.patch; fi
 	cd $(DBI) ; \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 	if test ! -d $(SQLITE); then tar xzf $(SQLITE_ARCHIVE); fi
+	MODULE_PATH=`pwd` ; \
 	cd $(SQLITE) ; \
-	if test ! -e Makefile; then perl -I.. -I../$(DBI) -I../$(DBI)/lib -I../$(DBI)/blib/arch -MConfig_ub Makefile.PL USE_LOCAL_SQLITE=1 ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -I../$(DBI) -I../$(DBI)/lib -I$$MODULE_PATH/$(DBI)/blib/arch -MConfig_ub Makefile.PL USE_LOCAL_SQLITE=1 ; fi ;\
 	make
 
 	if test ! -d $(SQLITE2); then tar xzf $(SQLITE2_ARCHIVE); fi
+	MODULE_PATH=`pwd` ; \
 	cd $(SQLITE2) ; \
-	if test ! -e Makefile; then perl -I.. -I../$(DBI) -I../$(DBI)/lib -I../$(DBI)/blib/arch -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -I../$(DBI) -I../$(DBI)/lib -I$$MODULE_PATH/$(DBI)/blib/arch -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 	if test ! -d $(TAGSET); then tar xzf $(TAGSET_ARCHIVE); fi
 	cd $(TAGSET) ; \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 	if test ! -d $(TEMPLATE); then tar xzf $(TEMPLATE_ARCHIVE); fi
 	cd $(TEMPLATE) ; \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 	if test ! -d $(TIMEDATE); then tar xzf $(TIMEDATE_ARCHIVE); fi
 	cd $(TIMEDATE) ; \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 xmlrpc_modules_build: $(XMLRPC_ARCHIVES)
 	if test ! -d $(VERSION_MODULE); then tar xzf $(VERSION_ARCHIVE); fi
 	cd $(VERSION_MODULE) ; \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL --perl_only ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL --perl_only ; fi ;\
 	make
 
 	if test ! -d $(CLASS_INSPECTOR); then tar xzf $(CLASS_INSPECTOR_ARCHIVE); fi
 	cd $(CLASS_INSPECTOR) ; \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 	if test ! -d $(SOAPLITE); then tar xzf $(SOAPLITE_ARCHIVE); fi
 	cd $(SOAPLITE) ; \
-	if test ! -e Makefile; then perl -I.. -I../$(CLASS_INSPECTOR)/blib/lib -MConfig_ub Makefile.PL -noprompt; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -I../$(CLASS_INSPECTOR)/blib/lib -MConfig_ub Makefile.PL -noprompt; fi ;\
 	make
 
 japanese_modules_build: $(JAPANESESUPPORT_ARCHIVES)
@@ -244,32 +256,42 @@ japanese_modules_build: $(JAPANESESUPPORT_ARCHIVES)
 	cd $(KAKASI); \
 	if test ! -e Makefile; \
 	then \
-	  PERL510=`perl -e 'print $$] ge qw{5.010000};'`; \
-	  PERL512=`perl -e 'print $$] ge qw{5.012000};'`; \
-	  PERL518=`perl -e 'print $$] ge qw{5.018000};'`; \
-	  if test "$$PERL518" == "1"; \
+	  PERL510=`$(PERL) -e 'print $$] ge qw{5.010000};'`; \
+	  PERL512=`$(PERL) -e 'print $$] ge qw{5.012000};'`; \
+	  PERL518=`$(PERL) -e 'print $$] ge qw{5.018000};'`; \
+	  OS_VERSION=`sw_vers -productVersion | awk -F "." '{print $$1}'`; \
+	  OS_MAJOR=`sw_vers -productVersion | awk -F "." '{print $$2}'`; \
+	  if test "$$OS_VERSION" == "11" -o "$$OS_VERSION" == "12" -o "$$OS_VERSION" == "13"; \
 	  then \
-		SDKPATH=`xcodebuild -version -sdk macosx10.10 | grep ^Path: | awk '{print $$2}'`; \
-		env CPPFLAGS="-Os -g -isysroot $$SDKPATH -arch i386 -arch x86_64" \
-		env LDFLAGS="-Wl,-syslibroot,$$SDKPATH -arch i386 -arch x86_64 -mmacosx-version-min=10.10" \
+		SDKPATH=`xcodebuild -version -sdk macosx | grep ^Path: | awk '{print $$2}'`; \
+		env CPPFLAGS="-Os -g -isysroot $$SDKPATH -arch arm64 -arch x86_64" \
+		env LDFLAGS="-Wl,-syslibroot,$$SDKPATH -arch arm64 -arch x86_64 -mmacosx-version-min=11.1" \
 		./configure --disable-dependency-tracking --disable-shared ; \
 	  else \
-		if test "$$PERL512" == "1"; \
+		if test "$$PERL518" == "1"; \
 		then \
-		  SDKPATH=`xcodebuild -version -sdk macosx10.7 | grep ^Path: | awk '{print $$2}'`; \
+		  SDKPATH=`xcodebuild -version -sdk macosx10.12 | grep ^Path: | awk '{print $$2}'`; \
 		  env CPPFLAGS="-Os -g -isysroot $$SDKPATH -arch i386 -arch x86_64" \
-		  env LDFLAGS="-Wl,-syslibroot,$$SDKPATH -arch i386 -arch x86_64 -mmacosx-version-min=10.7" \
+		  env LDFLAGS="-Wl,-syslibroot,$$SDKPATH -arch i386 -arch x86_64 -mmacosx-version-min=10.10" \
 		  ./configure --disable-dependency-tracking --disable-shared ; \
 		else \
-		  if test "$$PERL510" == "1"; \
+		  if test "$$PERL512" == "1"; \
 		  then \
-			env CPPFLAGS="-Os -g -isysroot /Developer/SDKs/MacOSX10.6.sdk -arch i386 -arch ppc7400 -arch x86_64" \
-			env LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.6.sdk -arch i386 -arch ppc7400 -arch x86_64 -mmacosx-version-min=10.6" \
+			SDKPATH=`xcodebuild -version -sdk macosx10.7 | grep ^Path: | awk '{print $$2}'`; \
+			env CPPFLAGS="-Os -g -isysroot $$SDKPATH -arch i386 -arch x86_64" \
+			env LDFLAGS="-Wl,-syslibroot,$$SDKPATH -arch i386 -arch x86_64 -mmacosx-version-min=10.7" \
 			./configure --disable-dependency-tracking --disable-shared ; \
 		  else \
-			env CPPFLAGS="-Os -g -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc750 -arch ppc7400 -arch ppc64" \
-			env LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc750 -arch ppc7400 -arch ppc64 -mmacosx-version-min=10.3" \
-			./configure --disable-dependency-tracking --disable-shared ; \
+			if test "$$PERL510" == "1"; \
+			then \
+			  env CPPFLAGS="-Os -g -isysroot /Developer/SDKs/MacOSX10.6.sdk -arch i386 -arch ppc7400 -arch x86_64" \
+			  env LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.6.sdk -arch i386 -arch ppc7400 -arch x86_64 -mmacosx-version-min=10.6" \
+			  ./configure --disable-dependency-tracking --disable-shared ; \
+			else \
+			  env CPPFLAGS="-Os -g -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc750 -arch ppc7400 -arch ppc64" \
+			  env LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc750 -arch ppc7400 -arch ppc64 -mmacosx-version-min=10.3" \
+			  ./configure --disable-dependency-tracking --disable-shared ; \
+			fi ; \
 		  fi ; \
 		fi ; \
 	  fi ; \
@@ -278,36 +300,70 @@ japanese_modules_build: $(JAPANESESUPPORT_ARCHIVES)
 
 	if test ! -d $(TEXTKAKASI); then tar xzf $(TEXTKAKASI_ARCHIVE); fi
 	cd $(TEXTKAKASI); \
-	if test ! -e Makefile; then perl -I.. -MConfig_kakasi Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_kakasi Makefile.PL ; fi ;\
 	make
 
 	if test ! -d $(ENCODE_IMAPUTF7); then tar xzf $(ENCODE_IMAPUTF7_ARCHIVE); fi
 	cd $(ENCODE_IMAPUTF7); \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 ssl_modules_build: $(SSL_ARCHIVES)
+	OS_VERSION=`sw_vers -productVersion | awk -F "." '{print $$1}'`; \
+	OS_MAJOR=`sw_vers -productVersion | awk -F "." '{print $$2}'`; \
+	if test "$$OS_VERSION" == "11" -o "$$OS_VERSION" == "12" -o "$$OS_VERSION" == "13"; \
+	then \
+	  if test ! -d $(OPENSSL_arm64); then \
+		mkdir $(OPENSSL_arm64); \
+		tar xzf $(OPENSSL_ARCHIVE) -C $(OPENSSL_arm64) --strip=1; \
+	  fi; \
+	  cd $(OPENSSL_arm64); \
+	  if test ! -e Makefile; then ./Configure darwin64-arm64-cc no-shared; fi ;\
+		make; \
+		cd ..; \
+	  fi; \
+	if test ! -d $(OPENSSL_x64); then \
+	  mkdir $(OPENSSL_x64); \
+	  tar xzf $(OPENSSL_ARCHIVE) -C $(OPENSSL_x64) --strip=1; \
+	fi; \
+	cd $(OPENSSL_x64); \
+	if test ! -e Makefile; then ./Configure darwin64-x86_64-cc no-shared; fi ;\
+	  make; \
+	cd ..; \
+	if test ! -d $(OPENSSL_universal); then mkdir $(OPENSSL_universal); fi; \
+	if test "$$OS_VERSION" == "11" -o "$$OS_VERSION" == "12" -o "$$OS_VERSION" == "13"; \
+	then \
+	  cp -rf $(OPENSSL_arm64)/include $(OPENSSL_universal); \
+	  if test ! -d $(OPENSSL_universal)/lib; then mkdir $(OPENSSL_universal)/lib; fi; \
+	  lipo -create -output $(OPENSSL_universal)/lib/libcrypto.a -arch x86_64 $(OPENSSL_x64)/libcrypto.a -arch arm64 $(OPENSSL_arm64)/libcrypto.a; \
+	  lipo -create -output $(OPENSSL_universal)/lib/libssl.a -arch x86_64 $(OPENSSL_x64)/libssl.a -arch arm64 $(OPENSSL_arm64)/libssl.a; \
+	  if test ! -d $(OPENSSL_universal)/bin; then mkdir $(OPENSSL_universal)/bin; fi; \
+	  lipo -create -output $(OPENSSL_universal)/bin/openssl -arch x86_64 $(OPENSSL_x64)/apps/openssl -arch arm64 $(OPENSSL_arm64)/apps/openssl; \
+	fi
+
 	if test ! -d $(NETSSLEAY); then tar xzf $(NETSSLEAY_ARCHIVE); fi
 	cd $(NETSSLEAY); \
-	if test ! -e Makefile; then PERL_MM_USE_DEFAULT=1 perl -I.. -MConfig_ub Makefile.PL ; fi ;\
-	make
-
-	if test ! -d $(IOSOCKETSSL); then tar xzf $(IOSOCKETSSL_ARCHIVE); fi
-	cd $(IOSOCKETSSL); \
-	if test ! -e Makefile; then perl -I.. -I../$(NETSSLEAY)/blib/lib -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then PERL_MM_USE_DEFAULT=1 OPENSSL_PREFIX=../$(OPENSSL_universal) $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 	if test ! -d $(MOZILLA_CA); then tar xzf $(MOZILLA_CA_ARCHIVE); fi
 	cd $(MOZILLA_CA); \
 	curl --output mk-ca-bundle.pl --location --silent https://github.com/bagder/curl/raw/master/lib/mk-ca-bundle.pl; \
-	perl mk-ca-bundle.pl -d nss -q lib/Mozilla/CA/cacert.pem; \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL ; fi ;\
+	$(PERL) mk-ca-bundle.pl -d nss -q lib/Mozilla/CA/cacert.pem; \
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
+	make
+
+	if test ! -d $(IOSOCKETSSL); then tar xzf $(IOSOCKETSSL_ARCHIVE); fi
+	cd $(IOSOCKETSSL); \
+	if test ! -e Makefile; then NO_NETWORK_TESTING=1 PERL_MM_USE_DEFAULT=1 \
+	  $(PERL) -I.. -I../$(FAKECONFIG)/lib -I../$(NETSSLEAY)/blib/lib -I../$(MOZILLA_CA)/lib -MConfig_ub Makefile.PL ; \
+	fi ;\
 	make
 
 socks_modules_build: $(SOCKS_ARCHIVES)
 	if test ! -d $(SOCKS); then tar xzf $(SOCKS_ARCHIVE); fi
 	cd $(SOCKS); \
-	if test ! -e Makefile; then perl -I.. -MConfig_ub Makefile.PL ; fi ;\
+	if test ! -e Makefile; then $(PERL) -I.. -I../$(FAKECONFIG)/lib -MConfig_ub Makefile.PL ; fi ;\
 	make
 
 $(DBI_ARCHIVE):
@@ -370,6 +426,11 @@ $(ENCODE_IMAPUTF7_ARCHIVE):
 	then \
 	  curl --output $(ENCODE_IMAPUTF7_ARCHIVE) --location --silent $(ENCODE_IMAPUTF7_URL); \
 	fi
+$(OPENSSL_ARCHIVE):
+	@if test ! -e $(OPENSSL_ARCHIVE); \
+	then \
+	  curl --output $(OPENSSL_ARCHIVE) --location --silent $(OPENSSL_URL); \
+	fi
 $(NETSSLEAY_ARCHIVE):
 	@if test ! -e $(NETSSLEAY_ARCHIVE); \
 	then \
@@ -391,15 +452,23 @@ $(SOCKS_ARCHIVE):
 	  curl --output $(SOCKS_ARCHIVE) --location --silent $(SOCKS_URL); \
 	fi
 
-fakeconfig:
-	@echo Checking ExtUtils::FakeConfig version...
-	@perl -MExtUtils::FakeConfig -e 'print $$ExtUtils::FakeConfig::VERSION,"\n";'
+fakeconfig: $(FAKECONFIG_ARCHIVE)
+	if test ! -d $(FAKECONFIG); then tar xzf $(FAKECONFIG_ARCHIVE); fi
+	cd $(FAKECONFIG) ; \
+	if test ! -e Makefile; then $(PERL) Makefile.PL ; fi ;\
+	make
+
+$(FAKECONFIG_ARCHIVE):
+	@if test ! -e $(FAKECONFIG_ARCHIVE); \
+	then \
+	  curl --output $(FAKECONFIG_ARCHIVE) --location --silent $(FAKECONFIG_URL); \
+	fi
 
 kakasi_dictionary: $(KAKASI)/kanwadict $(KAKASI)/itaijidict
 	cd $(KAKASI) ; \
 	head -c 73728 <kanwadict >kanwadict-head ; \
 	tail -c +73729 <kanwadict >kanwadict-body ; \
-	perl -e 'binmode STDIN; binmode STDOUT; $$a = qw(); while (<>) {$$a.=$$_}; $$a =~ s/(.)(.)(.)(.)/$$4$$3$$2$$1/sg; print $$a;' <kanwadict-head >kanwadict-head-swap ; \
+	$(PERL) -e 'binmode STDIN; binmode STDOUT; $$a = qw(); while (<>) {$$a.=$$_}; $$a =~ s/(.)(.)(.)(.)/$$4$$3$$2$$1/sg; print $$a;' <kanwadict-head >kanwadict-head-swap ; \
 	CPU_TYPE=`/usr/bin/uname -p` ; \
 	case $$CPU_TYPE in \
 	powerpc ) \
@@ -407,6 +476,10 @@ kakasi_dictionary: $(KAKASI)/kanwadict $(KAKASI)/itaijidict
 	  mv kanwadict-head kanwadict-head_ppc ; \
 	  ;; \
 	i386 ) \
+	  mv kanwadict-head kanwadict-head_i386 ; \
+	  mv kanwadict-head-swap kanwadict-head_ppc; \
+	  ;; \
+	arm ) \
 	  mv kanwadict-head kanwadict-head_i386 ; \
 	  mv kanwadict-head-swap kanwadict-head_ppc; \
 	  ;; \

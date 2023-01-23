@@ -23,23 +23,31 @@ CPU_TYPE=`/usr/bin/uname -p`
 # CPU_TYPE="i386"
 KANWADICT_PATH=/Library/POPFile/kakasi
 
-case $CPU_TYPE in
-	powerpc )
-		echo "PowerPC";
-		cat $KANWADICT_PATH/kanwadict-head_ppc $KANWADICT_PATH/kanwadict-body > $KANWADICT_PATH/kanwadict
-		;;
-	i386 )
-		echo "Intel";
-		cat $KANWADICT_PATH/kanwadict-head_i386 $KANWADICT_PATH/kanwadict-body > $KANWADICT_PATH/kanwadict
-		;;
-esac
+if [ -e $KANWADICT_PATH/kanwadict-head_ppc ] && [ -e $KANWADICT_PATH/kanwadict-head_i386 ] && [ -e $KANWADICT_PATH/kanwadict-body ]; then
 
-rm $KANWADICT_PATH/kanwadict-head_ppc
-rm $KANWADICT_PATH/kanwadict-head_i386
-rm $KANWADICT_PATH/kanwadict-body
+	case $CPU_TYPE in
+		powerpc )
+			echo "PowerPC";
+			cat $KANWADICT_PATH/kanwadict-head_ppc $KANWADICT_PATH/kanwadict-body > $KANWADICT_PATH/kanwadict
+			;;
+		i386 )
+			echo "Intel";
+			cat $KANWADICT_PATH/kanwadict-head_i386 $KANWADICT_PATH/kanwadict-body > $KANWADICT_PATH/kanwadict
+			;;
+		arm )
+			echo "Arm";
+			cat $KANWADICT_PATH/kanwadict-head_i386 $KANWADICT_PATH/kanwadict-body > $KANWADICT_PATH/kanwadict
+			;;
+	esac
+	
+	rm $KANWADICT_PATH/kanwadict-head_ppc
+	rm $KANWADICT_PATH/kanwadict-head_i386
+	rm $KANWADICT_PATH/kanwadict-body
 
-POPFILE_PLIST=/Library/LaunchDaemons/popfile.plist
+fi
+
 POPFILE_LABEL=org.getpopfile.popfile
+POPFILE_PLIST=/Library/LaunchDaemons/$POPFILE_LABEL.plist
 POPFILE_LOGDIR=/Library/Logs/POPFile/
 
 if [ ! -e "$POPFILE_LOGDIR" ]; then

@@ -17,7 +17,7 @@
 		<key>POPFILE_USER</key>
 		<string>/Library/POPFile/</string>
 		<key>VERSIONER_PERL_VERSION</key>
-		<string>5.18</string>
+		<string>5.30</string>
 	</dict>
 	<key>StandardErrorPath</key>
 	<string>/Library/Logs/POPFile/error.log</string>
